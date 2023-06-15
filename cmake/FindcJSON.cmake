@@ -35,4 +35,8 @@ ELSE()
 	SET( CJSON_DIR "" CACHE STRING
 		"An optional hint to a directory for finding `cJSON`"
 	)
+  SET( CJSON_INCLUDE_DIRS ${BUILD_CJSON_INCLUDE_DIRS} )
+	SET( CJSON_LIBRARIES ${BUILD_CJSON_LIBRARIES} )
+  message(STATUS "cjson include dir:" ${CJSON_INCLUDE_DIRS})
+  message(STATUS "cjson lib dir:" ${BUILD_CJSON_LIBRARIES})
 ENDIF()

@@ -33,7 +33,12 @@ option(WITH_TLS_PSK
 option(WITH_EC
 	"Include Elliptic Curve support (requires WITH_TLS)?" ON)
 if (WITH_TLS)
+  set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/cmake)
+  message(STATUS "OPENSSL_ROOT_DIR:" ${OPENSSL_ROOT_DIR})
 	find_package(OpenSSL REQUIRED)
+  if (NOT OPENSSL_FOUND)
+    message(STATUS "---------------OPENSSL_NOT_FOUND-------------------")
+  endif()
 	add_definitions("-DWITH_TLS")
 
 	if (WITH_TLS_PSK)

@@ -1,6 +1,9 @@
 include_directories(${mosquitto_SOURCE_DIR} ${mosquitto_SOURCE_DIR}/src
 		${mosquitto_SOURCE_DIR}/include ${mosquitto_SOURCE_DIR}/lib
-		${OPENSSL_INCLUDE_DIR} ${STDBOOL_H_PATH} ${STDINT_H_PATH})
+		${OPENSSL_INCLUDE_DIR} ${STDBOOL_H_PATH} ${STDINT_H_PATH}
+     ${LIBWEBSOCKETS_INCLUDE_DIR_HINTS}
+    )
+
 
 set (MOSQ_SRCS
 	../lib/alias_mosq.c ../lib/alias_mosq.h
@@ -135,6 +138,11 @@ endif (CMAKE_SYSTEM_NAME STREQUAL Linux)
 option(WITH_WEBSOCKETS "Include websockets support?" ON)
 option(STATIC_WEBSOCKETS "Use the static libwebsockets library?" OFF)
 if (WITH_WEBSOCKETS)
+  set(LIBWEBSOCKETS_ROOT_DIR ${CMAKE_SOURCE_DIR}/cmake)
+  message(STATUS "LIBWEBSOCKETS_ROOT_DIR:" ${LIBWEBSOCKETS_ROOT_DIR})
+  if (NOT LIBWEBSOCKETS_FOUND)
+    message(STATUS "---------------LIBWEBSOCKETS_NOT_FOUND-------------------")
+  endif()
 	find_package(libwebsockets)
 	add_definitions("-DWITH_WEBSOCKETS")
 endif (WITH_WEBSOCKETS)
@@ -158,6 +166,7 @@ if (WITH_DLT)
 endif (WITH_DLT)
 
 set (MOSQ_LIBS ${MOSQ_LIBS} ${OPENSSL_LIBRARIES})
+message(STATUS "MOSQ_LIBS:" ${MOSQ_LIBS})
 # Check for getaddrinfo_a
 include(CheckLibraryExists)
 check_library_exists(anl getaddrinfo_a  "" HAVE_GETADDRINFO_A)
@@ -202,10 +211,13 @@ if (WITH_WEBSOCKETS)
 	else (STATIC_WEBSOCKETS)
 		set (MOSQ_LIBS ${MOSQ_LIBS} websockets)
 	endif (STATIC_WEBSOCKETS)
+  set (MOSQ_LIBS ${MOSQ_LIBS} ${LIBWEBSOCKETS_LIBRARIES})
+  message(STATUS "------------LIBWEBSOCKETS_LIBRARIES:" ${LIBWEBSOCKETS_LIBRARIES})
 endif (WITH_WEBSOCKETS)
 
 add_executable(mosquitto ${MOSQ_SRCS})
 target_link_libraries(mosquitto ${MOSQ_LIBS})
+message(STATUS "-----------------MOSQ_LIBS:" ${MOSQ_LIBS})
 if (WIN32)
 	set_target_properties(mosquitto PROPERTIES ENABLE_EXPORTS 1)
 endif (WIN32)
